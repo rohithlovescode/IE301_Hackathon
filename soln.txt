@@ -1,0 +1,63 @@
+/*
+--1.
+SELECT movie_id, title, rating 
+FROM Movie 
+WHERE status='Now Showing'
+*/
+
+/*
+--2.
+Select reviewer_name, review_date, content
+FROM Review
+Where movie_id=1
+*/
+
+/*
+--3.
+select * from User
+Where email ISNULL
+*/
+
+/*
+--4.
+select B.item_id, A.name, B.price_at_time rate
+From FoodItem A
+JOIN FoodOrderItem B ON A.item_id=B.item_id
+*/
+
+/*
+--MEDIUM LEVEL Q1
+SELECT A.user_id, A.name, Count(B.booking_id) As total_bookings
+From User A 
+LEFT JOIN Booking B On A.user_id=B.user_id
+Group by A.user_id
+Order By total_bookings DESC, A.user_id
+*/
+
+/*
+--Q2
+SELECT A.title, SUM(transaction_amount) as total_revenue
+FROM Movie A
+JOIN Show B ON A.movie_id=B.movie_id
+JOIN Booking C ON B.show_id=C.show_id
+JOIN Payment D ON C.booking_id=D.booking_id
+GROUP BY A.movie_id
+ORder by total_revenue desc
+*/
+
+--Customer Segmentation Question
+
+SELECT 
+    u.user_id, 
+    u.name, 
+    (COALESCE(SUM(b.total_cost), 0) + COALESCE(SUM(f.total_cost), 0)) AS total_spending,
+    CASE 
+        WHEN (COALESCE(SUM(b.total_cost), 0) + COALESCE(SUM(f.total_cost), 0)) >= 10000 THEN 'High'
+        WHEN (COALESCE(SUM(b.total_cost), 0) + COALESCE(SUM(f.total_cost), 0)) BETWEEN 5000 AND 9999 THEN 'Medium'
+        ELSE 'Low'
+    END AS spending_category
+FROM USER u
+LEFT JOIN BOOKING b ON u.user_id = b.user_id
+LEFT JOIN FOODORDER f ON u.user_id = f.booking_id
+GROUP BY u.user_id, u.name
+ORDER BY total_spending DESC;
